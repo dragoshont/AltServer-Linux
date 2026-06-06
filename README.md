@@ -1,3 +1,32 @@
+> ## ⚠️ This is dragoshont's maintained fork
+>
+> NyaMisty's upstream (AltServer-Linux + AltSign-Linux) is unmaintained (last
+> release **v0.0.5, Apr 2022**) and its vendored `ldid` signer emits a dual
+> SHA1+SHA256 CodeDirectory + legacy-DER entitlements that modern AMFI rejects —
+> apps install but are **killed at launch on iOS 17+/26 with `Code=85`**.
+>
+> This fork is part of **[altserver-stack](https://github.com/dragoshont/altserver-stack)**,
+> a self-contained, reproducible build chain that:
+> - delegates the codesign step to a patched **zsign** ([dragoshont/zsign](https://github.com/dragoshont/zsign), upstream PR [zhlynn/zsign#391](https://github.com/zhlynn/zsign/pull/391) — SHA256-only CodeDirectory + Apple-canonical DER entitlements),
+> - repoints the AltSign submodule at [dragoshont/AltSign-Linux](https://github.com/dragoshont/AltSign-Linux) so no build path depends on a deletable upstream account,
+> - pins every dependency and vendors the whole Alpine build toolchain.
+>
+> **Verified end-to-end on a physical iPhone 16 Pro Max running iOS 26.5** (apps
+> install, launch, and stay alive).
+>
+> ### Just want the binary? Don't build this repo.
+> Pull the prebuilt, fully-static, iOS-26-valid image:
+> ```bash
+> docker run --rm -v /opt/altserver:/dest \
+>   ghcr.io/dragoshont/altserver-linux:latest-main extract
+> ```
+> That drops a working `AltServer` + patched `zsign` into `/opt/altserver`.
+> Full build pipeline & the whole story: **https://github.com/dragoshont/altserver-stack**
+>
+> Pinned in altserver-stack → AltServer-Linux `9282aff`, AltSign-Linux `0daf107`, zsign `fe1750d`.
+>
+> ---
+
 # AltServer-Linux
 AltServer for AltStore, but on-device
 
