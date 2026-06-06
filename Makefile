@@ -107,3 +107,4 @@ clean:
 
 all: $(PROGRAM)
 .DEFAULT_GOAL := all
+gsa
