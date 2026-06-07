@@ -49,7 +49,15 @@ using namespace web::http::client;          // HTTP client features
 
 std::shared_ptr<AnisetteData> AnisetteDataManager::FetchAnisetteData()
 {
-	std::string wideURI = ("/anisette/irGb3Quww8zrhgqnzmrx");
+	// The anisette server is overridable via ALTSERVER_ANISETTE_SERVER so a
+	// self-hosted anisette-v3-server can replace the historical public
+	// armconverter.com default — a flaky third party that returns 502 when its
+	// origin is down. A v3 server returns the same header JSON from its flat
+	// "GET /" endpoint, so only the base URL and the request path differ.
+	const char* anisetteEnv = std::getenv("ALTSERVER_ANISETTE_SERVER");
+	bool useConfiguredAnisette = (anisetteEnv != nullptr && anisetteEnv[0] != '\0');
+	std::string anisetteHost = useConfiguredAnisette ? std::string(anisetteEnv) : std::string("https://armconverter.com");
+	std::string wideURI = useConfiguredAnisette ? std::string("/") : std::string("/anisette/irGb3Quww8zrhgqnzmrx");
 	
 	auto encodedURI = web::uri::encode_uri(wideURI);
 	uri_builder builder(encodedURI);
@@ -73,7 +81,7 @@ std::shared_ptr<AnisetteData> AnisetteDataManager::FetchAnisetteData()
 
 	std::shared_ptr<AnisetteData> anisetteData = NULL;
 
-	auto client = web::http::client::http_client(U("https://armconverter.com"));
+	auto client = web::http::client::http_client(anisetteHost);
 	auto task = client.request(request)
 		.then([=](http_response response)
 			{
